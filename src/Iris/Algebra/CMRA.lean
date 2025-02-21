@@ -5,6 +5,10 @@ Authors: Mario Carneiro
 -/
 import Iris.Algebra.OFE
 
+import Grw.Morphism
+import Grw.Tactic
+
+
 namespace Iris
 open OFE
 
@@ -29,6 +33,7 @@ class CMRA (α : Type _) extends OFE α where
   validN_op_l : validN n (op x y) → validN n x
   extend : validN n x → x ≡{n}≡ op y₁ y₂ →
     Σ' z₁ z₂, x ≡ op z₁ z₂ ∧ z₁ ≡{n}≡ y₁ ∧ z₂ ≡{n}≡ y₂
+
 
 namespace CMRA
 variable [CMRA α]
@@ -76,3 +81,46 @@ class UCMRA (α : Type _) extends CMRA α where
   unit_valid : ✓ unit
   unit_left_id : unit • x ≡ x
   pcore_unit : pcore unit ≡ some unit
+
+instance [CMRA α] (n : Nat) : Proper (OFE.Dist (α := α) n ⟹ OFE.Dist (α := α) n ⟹ OFE.Dist n) (CMRA.op (α := α)) where
+  proper := sorry
+
+instance [CMRA α] (n : Nat) : Reflexive (OFE.Dist (α := α) n) where
+  rfl := sorry
+
+instance [CMRA α] (n : Nat) : Transitive (OFE.Dist (α := α) n) where
+  trans := sorry
+
+instance [CMRA α] : Proper (OFE.Equiv (α := α) ⟹ OFE.Equiv (α := α) ⟹ impl) (OFE.Equiv (α := α)) where
+  proper x y heq := by
+    unfold respectful impl
+    rintro h1 h2 h3
+    sorry
+
+instance [CMRA α] : Proper (OFE.Equiv (α := α) ⟹ OFE.Equiv (α := α) ⟹ flip impl) (OFE.Equiv (α := α)) where
+  proper x y heq := by
+    unfold respectful impl
+    rintro h1 h2 h3
+    sorry
+
+
+instance [CMRA α] : Proper (OFE.Equiv (α := α) ⟹ OFE.Equiv (α := α) ⟹ OFE.Equiv) (CMRA.op (α := α)) where
+  proper := sorry
+
+instance [CMRA α] : Reflexive (OFE.Equiv (α := α)) where
+  rfl := sorry
+
+instance [CMRA α] : Transitive (OFE.Equiv (α := α)) where
+  trans := sorry
+
+instance [CMRA α] : Symmetric (OFE.Equiv (α := α)) where
+  symm := sorry
+
+set_option trace.Meta.Tactic.grewrite true
+
+theorem test' [CMRA α] (x y z : α) (n : Nat) (heq : x • y ≡ y • x) : (x • y) ≡  (y • x) := by
+  grewrite [heq]
+
+
+theorem test [CMRA α] (x y z : α) (n : Nat) (heq : x • y ≡ y • x) : z • (x • y) ≡ z • (y • x) := by
+  grewrite [heq]
